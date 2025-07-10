@@ -66,9 +66,9 @@
 
         // Authorize Discord
         function authorizeDiscord() {
-            const clientId = "YOUR_CLIENT_ID"; // Замените на ваш Client ID
+            const clientId = "1392978255505657948"; // Замените на ваш Client ID
             const redirectUri = encodeURIComponent("https://gusikthebest.github.io/teleg/auth");
-            const oauthUrl = `https://discord.com/api/oauth2/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=identify%20guilds`;
+            const oauthUrl = `https://discord.com/oauth2/authorize?client_id=1392978255505657948&response_type=code&redirect_uri=https%3A%2F%2Fgusikthebest.github.io%2Fteleg%2Fauth&scope=identify+guilds`;
             window.open(oauthUrl, '_blank');
         }
 
